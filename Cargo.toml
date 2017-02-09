@@ -1,0 +1,6 @@
+[package]
+name = "ranged_set"
+version = "0.1.0"
+authors = ["Ryan Quattlebaum <ryan.quattlebaum@icloud.com>"]
+
+[dependencies]
