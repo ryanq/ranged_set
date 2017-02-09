@@ -5,11 +5,11 @@ enum Element<T> {
     Range(Range<T>),
 }
 
-pub struct RangedSet<T: Eq + Ord> {
+pub struct RangedSet<T: PartialEq + PartialOrd> {
     ranges: Vec<Element<T>>,
 }
 
-impl<T: Eq + Ord> RangedSet<T> {
+impl<T: PartialEq + PartialOrd> RangedSet<T> {
     pub fn new() -> RangedSet<T> {
         RangedSet {
             ranges: Vec::new(),
