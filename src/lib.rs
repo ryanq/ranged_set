@@ -45,14 +45,17 @@ impl<T: Ord> RangedSet<T> {
 }
 
 #[test]
-fn contains_values() {
-    let mut rs = RangedSet::new();
+fn contains_on_set_with_no_elements() {
+    let rs = RangedSet::new();
 
     assert!(!rs.contains(&0));
     assert!(!rs.contains(&1));
     assert!(!rs.contains(&2));
+}
 
-    rs = RangedSet {
+#[test]
+fn contains_on_set_with_single_elements() {
+    let rs = RangedSet {
         ranges: vec![Element::Single(1), Element::Single(3)],
     };
 
@@ -61,8 +64,11 @@ fn contains_values() {
     assert!(!rs.contains(&2));
     assert!(rs.contains(&3));
     assert!(!rs.contains(&4));
+}
 
-    rs = RangedSet {
+#[test]
+fn contains_on_set_with_range_elements() {
+    let rs = RangedSet {
         ranges: vec![Element::Range(0..2), Element::Range(5..8)],
     };
 
@@ -76,8 +82,11 @@ fn contains_values() {
     assert!(rs.contains(&7));
     assert!(!rs.contains(&8));
     assert!(!rs.contains(&9));
+}
 
-    rs = RangedSet {
+#[test]
+fn contains_on_set_with_mixed_elements() {
+    let rs = RangedSet {
         ranges: vec![Element::Range(0..2), Element::Single(4)],
     };
 
