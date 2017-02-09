@@ -4,3 +4,4 @@ version = "0.2.0"
 authors = ["Ryan Quattlebaum <ryan.quattlebaum@icloud.com>"]
 
 [dependencies]
+num-traits = "0.1.36"

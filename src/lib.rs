@@ -1,15 +1,33 @@
+extern crate num_traits;
+
 use std::ops::Range;
 
-enum Element<T> {
+use num_traits::PrimInt;
+
+#[derive(Debug, PartialEq)]
+enum Element<T: PrimInt> {
     Single(T),
     Range(Range<T>),
 }
 
-pub struct RangedSet<T: Ord> {
+impl<T: PrimInt> Element<T> {
+    fn adjacent_to(&self, value: &T) -> bool {
+        match self {
+            &Element::Single(ref s) if s < value => *value - *s == T::one(),
+            &Element::Single(ref s) if s > value => *s - *value == T::one(),
+            &Element::Single(_) => false,
+            &Element::Range(ref r) if *value < r.start => r.start - *value == T::one(),
+            &Element::Range(ref r) if *value == r.end => true,
+            &Element::Range(_) => false,
+        }
+    }
+}
+
+pub struct RangedSet<T: PrimInt> {
     ranges: Vec<Element<T>>,
 }
 
-impl<T: Ord> RangedSet<T> {
+impl<T: PrimInt> RangedSet<T> {
     pub fn new() -> RangedSet<T> {
         RangedSet {
             ranges: Vec::new(),
