@@ -41,6 +41,50 @@ impl<T: PrimInt> RangedSet<T> {
         }
     }
 
+    pub fn insert(&mut self, value: T) -> bool {
+        use Element::*;
+
+        enum Operation<T> {
+            InsertSingle(usize, T),
+            NoOp,
+        }
+
+        let operation = {
+            let slot = self.find_index_for(&value);
+            match slot {
+                // The value is already contained in the element at the
+                // index returned in the Ok() value, so nothing needs
+                // doing.
+                Ok(_) => Operation::NoOp,
+
+                // The value wasn't found, so the index contained in the
+                // Err() value is where to insert it to maintain sort
+                // order. The value needs to be added to the list of
+                // elements, either as a single value or by merging with
+                // another element.
+                Err(index) => {
+                    let before = index.checked_sub(1).and_then(|i| self.ranges.get(i));
+                    let after = self.ranges.get(index);
+                    match (before, after) {
+                        (None, None) => Operation::InsertSingle(index, value),
+                        (Some(b), None) if !b.adjacent_to(&value) => Operation::InsertSingle(index, value),
+                        (None, Some(a)) if !a.adjacent_to(&value) => Operation::InsertSingle(index, value),
+                        (Some(b), Some(a)) if !b.adjacent_to(&value) && !a.adjacent_to(&value) => Operation::InsertSingle(index, value),
+                        _ => unimplemented!(),
+                    }
+                }
+            }
+        };
+
+        match operation {
+            Operation::NoOp => false,
+            Operation::InsertSingle(index, value) => {
+                self.ranges.insert(index, Single(value));
+                true
+            }
+        }
+    }
+
     fn find_index_for(&self, value: &T) -> Result<usize, usize> {
         use std::cmp::Ordering;
         use Element::*;
@@ -63,7 +107,7 @@ impl<T: PrimInt> RangedSet<T> {
 }
 
 #[test]
-fn contains_on_set_with_no_elements() {
+fn contains_value_on_set_with_no_elements() {
     let rs = RangedSet::new();
 
     assert!(!rs.contains(&0));
@@ -72,7 +116,7 @@ fn contains_on_set_with_no_elements() {
 }
 
 #[test]
-fn contains_on_set_with_single_elements() {
+fn contains_value_on_set_with_single_elements() {
     use Element::*;
 
     let rs = RangedSet {
@@ -87,7 +131,7 @@ fn contains_on_set_with_single_elements() {
 }
 
 #[test]
-fn contains_on_set_with_range_elements() {
+fn contains_value_on_set_with_range_elements() {
     use Element::*;
 
     let rs = RangedSet {
@@ -107,7 +151,7 @@ fn contains_on_set_with_range_elements() {
 }
 
 #[test]
-fn contains_on_set_with_mixed_elements() {
+fn contains_value_on_set_with_mixed_elements() {
     use Element::*;
 
     let rs = RangedSet {
@@ -120,4 +164,71 @@ fn contains_on_set_with_mixed_elements() {
     assert!(!rs.contains(&3));
     assert!(rs.contains(&4));
     assert!(!rs.contains(&5));
+}
+
+#[test]
+fn insert_value_on_empty_set() {
+    use Element::*;
+
+    let mut rs = RangedSet::new();
+
+    assert!(rs.insert(0));
+
+    assert_eq!(&rs.ranges[..], &[Single(0)]);
+}
+
+#[test]
+fn insert_duplicate_value_on_single_element() {
+    use Element::*;
+
+    let mut rs = RangedSet::new();
+
+    assert!(rs.insert(0));
+    assert!(!rs.insert(0));
+
+    assert_eq!(&rs.ranges[..], &[Single(0)]);
+}
+
+#[test]
+fn insert_noncontiguous_value_with_single_elements() {
+    use Element::*;
+
+    let mut rs = RangedSet::new();
+
+    assert!(rs.insert(0));
+    assert!(rs.insert(2));
+    assert!(rs.insert(4));
+    assert!(rs.insert(6));
+    assert!(rs.insert(8));
+
+    assert_eq!(&rs.ranges[..], &[Single(0), Single(2), Single(4), Single(6), Single(8)]);
+}
+
+#[test]
+fn insert_noncontiguous_value_with_range_elements() {
+    use Element::*;
+
+    let mut rs = RangedSet {
+        ranges: vec![Range(2..4), Range(7..9)],
+    };
+
+    assert!(rs.insert(0));
+    assert!(rs.insert(5));
+    assert!(rs.insert(10));
+
+    assert_eq!(&rs.ranges[..], &[Single(0), Range(2..4), Single(5), Range(7..9), Single(10)]);
+}
+
+#[test]
+fn insert_noncontiguous_value_with_mixed_elements() {
+    use Element::*;
+
+    let mut rs = RangedSet {
+        ranges: vec![Single(0), Range(4..6), Single(9)],
+    };
+
+    assert!(rs.insert(2));
+    assert!(rs.insert(7));
+
+    assert_eq!(&rs.ranges[..], &[Single(0), Single(2), Range(4..6), Single(7), Single(9)]);
 }
