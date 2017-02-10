@@ -1,3 +1,6 @@
+#[cfg(test)]
+mod tests;
+
 use std::ops::Range;
 use num_traits::PrimInt;
 
@@ -34,10 +37,18 @@ impl<T: PrimInt> Element<T> {
             (Element::Single(s), Element::Single(v)) if s < v => Element::Range(s..(v + T::one())),
             (Element::Single(s), Element::Single(v)) if v < s => Element::Range(v..(s + T::one())),
             (Element::Single(_), Element::Single(_)) => unimplemented!(),
+
+            (Element::Single(s), Element::Range(ref v)) if s + T::one() == v.start => Element::Range(s..v.end),
+            (Element::Single(s), Element::Range(ref v)) if s == v.end => Element::Range(v.start..(s + T::one())),
+            (Element::Single(_), Element::Range(_)) => unimplemented!(),
+
             (Element::Range(ref r), Element::Single(v)) if v < r.start => Element::Range(v..r.end),
             (Element::Range(ref r), Element::Single(v)) if v == r.end => Element::Range(r.start..(v + T::one())),
-            (Element::Range(r), Element::Range(v)) => Element::Range(r.start..v.end),
-            _ => unimplemented!(),
+            (Element::Range(_), Element::Single(_)) => unimplemented!(),
+
+            (Element::Range(ref r), Element::Range(ref v)) if r.end == v.start => Element::Range(r.start..v.end),
+            (Element::Range(ref r), Element::Range(ref v)) if v.end == r.start => Element::Range(v.start..r.end),
+            (Element::Range(_), Element::Range(_)) => unimplemented!(),
         }
     }
 }
