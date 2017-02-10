@@ -9,6 +9,12 @@ The format is based on [Keep a Changelog] and this project adheres to
 Unreleased
 ----------
 
+0.2.0 - 2017-02-10
+------------------
+
+Adds the `insert(...)` function to `RangedSet`. This handles adding
+values to the set and merging values with previous elements.
+
 ### Added
 
 - `RangedSet::insert(&mut self, value: T)` function for adding values to
