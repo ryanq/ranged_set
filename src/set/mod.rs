@@ -4,6 +4,7 @@ mod tests;
 use std::clone::Clone;
 use num_traits::PrimInt;
 use element::Element;
+use element::Element::*;
 
 pub struct RangedSet<T: PrimInt> {
     ranges: Vec<Element<T>>,
@@ -24,8 +25,6 @@ impl<T: PrimInt> RangedSet<T> {
     }
 
     pub fn insert(&mut self, value: T) -> bool {
-        use element::Element::*;
-
         enum Operation<T> {
             InsertSingle(usize, T),
             TwoWayMerge(usize, T),
@@ -95,7 +94,6 @@ impl<T: PrimInt> RangedSet<T> {
 
     fn find_index_for(&self, value: &T) -> Result<usize, usize> {
         use std::cmp::Ordering;
-        use element::Element::*;
 
         self.ranges.binary_search_by(|member| {
             match (member, value) {
