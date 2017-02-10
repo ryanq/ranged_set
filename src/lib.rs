@@ -1,13 +1,22 @@
 extern crate num_traits;
 
+use std::clone::Clone;
 use std::ops::Range;
 
 use num_traits::PrimInt;
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 enum Element<T: PrimInt> {
     Single(T),
     Range(Range<T>),
+}
+
+impl<T: PrimInt> From<T> for Element<T> {
+    fn from(v: T) -> Self { Element::Single(v) }
+}
+
+impl<T: PrimInt> From<Range<T>> for Element<T> {
+    fn from(v: Range<T>) -> Self { Element::Range(v) }
 }
 
 impl<T: PrimInt> Element<T> {
@@ -19,6 +28,20 @@ impl<T: PrimInt> Element<T> {
             &Element::Range(ref r) if *value < r.start => r.start - *value == T::one(),
             &Element::Range(ref r) if *value == r.end => true,
             &Element::Range(_) => false,
+        }
+    }
+
+    fn merge<S>(self, value: S) -> Self where S: Into<Self> {
+        let v = value.into();
+
+        match (self, v) {
+            (Element::Single(s), Element::Single(v)) if s < v => Element::Range(s..(v + T::one())),
+            (Element::Single(s), Element::Single(v)) if v < s => Element::Range(v..(s + T::one())),
+            (Element::Single(_), Element::Single(_)) => unimplemented!(),
+            (Element::Range(ref r), Element::Single(v)) if v < r.start => Element::Range(v..r.end),
+            (Element::Range(ref r), Element::Single(v)) if v == r.end => Element::Range(r.start..(v + T::one())),
+            (Element::Range(r), Element::Range(v)) => Element::Range(r.start..v.end),
+            _ => unimplemented!(),
         }
     }
 }
@@ -46,6 +69,8 @@ impl<T: PrimInt> RangedSet<T> {
 
         enum Operation<T> {
             InsertSingle(usize, T),
+            TwoWayMerge(usize, T),
+            ThreeWayMerge(usize, usize, T),
             NoOp,
         }
 
@@ -69,7 +94,12 @@ impl<T: PrimInt> RangedSet<T> {
                         (None, None) => Operation::InsertSingle(index, value),
                         (Some(b), None) if !b.adjacent_to(&value) => Operation::InsertSingle(index, value),
                         (None, Some(a)) if !a.adjacent_to(&value) => Operation::InsertSingle(index, value),
+                        (Some(b), None) if b.adjacent_to(&value) => Operation::TwoWayMerge(index - 1, value),
+                        (None, Some(a)) if a.adjacent_to(&value) => Operation::TwoWayMerge(index, value),
                         (Some(b), Some(a)) if !b.adjacent_to(&value) && !a.adjacent_to(&value) => Operation::InsertSingle(index, value),
+                        (Some(b), Some(a)) if b.adjacent_to(&value) && !a.adjacent_to(&value) => Operation::TwoWayMerge(index - 1, value),
+                        (Some(b), Some(a)) if !b.adjacent_to(&value) && a.adjacent_to(&value) => Operation::TwoWayMerge(index, value),
+                        (Some(b), Some(a)) if b.adjacent_to(&value) && a.adjacent_to(&value) => Operation::ThreeWayMerge(index - 1, index, value),
                         _ => unimplemented!(),
                     }
                 }
@@ -80,6 +110,25 @@ impl<T: PrimInt> RangedSet<T> {
             Operation::NoOp => false,
             Operation::InsertSingle(index, value) => {
                 self.ranges.insert(index, Single(value));
+                true
+            }
+            Operation::TwoWayMerge(index, value) => {
+                let existing = self.ranges[index].clone();
+                let merged = existing.merge(value);
+
+                self.ranges.push(merged);
+                let _ = self.ranges.swap_remove(index);
+                true
+            }
+            Operation::ThreeWayMerge(index_before, index_after, value) => {
+                let before = self.ranges[index_before].clone();
+                let after = self.ranges[index_after].clone();
+                let merged_before = before.merge(value);
+                let merged = merged_before.merge(after);
+
+                self.ranges.push(merged);
+                let _ = self.ranges.swap_remove(index_before);
+                let _ = self.ranges.remove(index_after);
                 true
             }
         }
@@ -231,4 +280,48 @@ fn insert_noncontiguous_value_with_mixed_elements() {
     assert!(rs.insert(7));
 
     assert_eq!(&rs.ranges[..], &[Single(0), Single(2), Range(4..6), Single(7), Single(9)]);
+}
+
+#[test]
+fn insert_contiguous_value_with_single_elements() {
+    use Element::*;
+
+    let mut rs = RangedSet {
+        ranges: vec![Single(0), Single(4), Single(6), Single(8)],
+    };
+
+    assert!(rs.insert(1));
+    assert!(rs.insert(3));
+    assert!(rs.insert(7));
+
+    assert_eq!(&rs.ranges[..], &[Range(0..2), Range(3..5), Range(6..9)]);
+}
+
+#[test]
+fn insert_contiguous_value_with_range_elements() {
+    use Element::*;
+
+    let mut rs = RangedSet {
+        ranges: vec![Range(0..2), Range(5..7), Range(8..10), Range(11..13)],
+    };
+
+    assert!(rs.insert(2));
+    assert!(rs.insert(4));
+    assert!(rs.insert(10));
+
+    assert_eq!(&rs.ranges[..], &[Range(0..3), Range(4..7), Range(8..13)]);
+}
+
+#[test]
+fn insert_contiguous_value_with_mixed_elements() {
+    use Element::*;
+
+    let mut rs = RangedSet {
+        ranges: vec![Single(0), Range(2..4), Single(5)],
+    };
+
+    assert!(rs.insert(1));
+    assert!(rs.insert(4));
+
+    assert_eq!(&rs.ranges[..], &[Range(0..6)]);
 }
