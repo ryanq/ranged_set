@@ -1,6 +1,10 @@
 `ranged_set`
 ============
 
+[![Build Status][travis-badge]][travis-ci]
+[![Build status][appveyor-badge]][appveyor-ci]
+[![Crate on crates.io][crates.io-badge]][crates.io]
+
 `ranged_set` is a crate that provides the type `RangedSet<T>`, which
 acts as a set for numeric types and stores contiguous values in ranges
 instead of in a hash table.
@@ -40,4 +44,10 @@ set.insert(4);
 assert!(set.contains(&0));
 ```
 
+[travis-badge]: https://travis-ci.org/ryanq/ranged_set.svg?branch=master
+[travis-ci]: https://travis-ci.org/ryanq/ranged_set
+[appveyor-badge]: https://ci.appveyor.com/api/projects/status/3qth32heony0a0nw?svg=true
+[appveyor-ci]: https://ci.appveyor.com/project/ryanq/ranged-set
+[crates.io-badge]: https://img.shields.io/crates/v/ranged_set.svg
+[crates.io]: https://crates.io/crates/ranged_set
 [docs.rs]: https://docs.rs/ranged_set/0.2.0/ranged_set/

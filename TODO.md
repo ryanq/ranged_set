@@ -1,13 +1,6 @@
 To-do list for ranged_set
 =========================
 
- - Set up Travis CI builds
-
-Cargo.toml
-----------
-
- - Add CI badge field
-
 src/lib.rs
 ----------
 

@@ -13,5 +13,9 @@ license = "MIT/Apache-2.0"
 repository = "https://github.com/ryanq/ranged_set"
 documentation = "https://docs.rs/ranged_set/0.2.0/ranged_set/"
 
+[badges]
+travis-ci = { repository = "ryanq/ranged_set" }
+appveyor = { repository = "ryanq/ranged_set" }
+
 [dependencies]
 num-traits = "0.1.36"
