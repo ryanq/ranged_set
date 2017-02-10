@@ -3,5 +3,15 @@ name = "ranged_set"
 version = "0.2.0"
 authors = ["Ryan Quattlebaum <ryan.quattlebaum@icloud.com>"]
 
+description = "A set that stores contiguous values as a range. Designed to be used with numeric types."
+keywords = ["set"]
+categories = ["data-structures"]
+
+readme = "README.md"
+license = "MIT/Apache-2.0"
+
+repository = "https://github.com/ryanq/ranged_set"
+documentation = "https://docs.rs/ranged_set/0.2.0/ranged_set/"
+
 [dependencies]
 num-traits = "0.1.36"

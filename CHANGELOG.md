@@ -22,6 +22,8 @@ values to the set and merging values with previous elements.
 
 - Tests to verify the behavior of `RangedSet::insert(...)`.
 
+- Added README.md, TODO.md, and Cargo.toml metadata
+
 0.1.0 - 2017-02-09
 ------------------
 
