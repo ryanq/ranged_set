@@ -73,8 +73,10 @@ fn contains_on_set_with_no_elements() {
 
 #[test]
 fn contains_on_set_with_single_elements() {
+    use Element::*;
+
     let rs = RangedSet {
-        ranges: vec![Element::Single(1), Element::Single(3)],
+        ranges: vec![Single(1), Single(3)],
     };
 
     assert!(!rs.contains(&0));
@@ -86,8 +88,10 @@ fn contains_on_set_with_single_elements() {
 
 #[test]
 fn contains_on_set_with_range_elements() {
+    use Element::*;
+
     let rs = RangedSet {
-        ranges: vec![Element::Range(0..2), Element::Range(5..8)],
+        ranges: vec![Range(0..2), Range(5..8)],
     };
 
     assert!(rs.contains(&0));
@@ -104,8 +108,10 @@ fn contains_on_set_with_range_elements() {
 
 #[test]
 fn contains_on_set_with_mixed_elements() {
+    use Element::*;
+
     let rs = RangedSet {
-        ranges: vec![Element::Range(0..2), Element::Single(4)],
+        ranges: vec![Range(0..2), Single(4)],
     };
 
     assert!(rs.contains(&0));
