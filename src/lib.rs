@@ -1,50 +1,10 @@
 extern crate num_traits;
 
+mod element;
+
 use std::clone::Clone;
-use std::ops::Range;
-
 use num_traits::PrimInt;
-
-#[derive(Clone, Debug, PartialEq)]
-enum Element<T: PrimInt> {
-    Single(T),
-    Range(Range<T>),
-}
-
-impl<T: PrimInt> From<T> for Element<T> {
-    fn from(v: T) -> Self { Element::Single(v) }
-}
-
-impl<T: PrimInt> From<Range<T>> for Element<T> {
-    fn from(v: Range<T>) -> Self { Element::Range(v) }
-}
-
-impl<T: PrimInt> Element<T> {
-    fn adjacent_to(&self, value: &T) -> bool {
-        match self {
-            &Element::Single(ref s) if s < value => *value - *s == T::one(),
-            &Element::Single(ref s) if s > value => *s - *value == T::one(),
-            &Element::Single(_) => false,
-            &Element::Range(ref r) if *value < r.start => r.start - *value == T::one(),
-            &Element::Range(ref r) if *value == r.end => true,
-            &Element::Range(_) => false,
-        }
-    }
-
-    fn merge<S>(self, value: S) -> Self where S: Into<Self> {
-        let v = value.into();
-
-        match (self, v) {
-            (Element::Single(s), Element::Single(v)) if s < v => Element::Range(s..(v + T::one())),
-            (Element::Single(s), Element::Single(v)) if v < s => Element::Range(v..(s + T::one())),
-            (Element::Single(_), Element::Single(_)) => unimplemented!(),
-            (Element::Range(ref r), Element::Single(v)) if v < r.start => Element::Range(v..r.end),
-            (Element::Range(ref r), Element::Single(v)) if v == r.end => Element::Range(r.start..(v + T::one())),
-            (Element::Range(r), Element::Range(v)) => Element::Range(r.start..v.end),
-            _ => unimplemented!(),
-        }
-    }
-}
+use element::Element;
 
 pub struct RangedSet<T: PrimInt> {
     ranges: Vec<Element<T>>,
@@ -65,7 +25,7 @@ impl<T: PrimInt> RangedSet<T> {
     }
 
     pub fn insert(&mut self, value: T) -> bool {
-        use Element::*;
+        use element::Element::*;
 
         enum Operation<T> {
             InsertSingle(usize, T),
@@ -136,7 +96,7 @@ impl<T: PrimInt> RangedSet<T> {
 
     fn find_index_for(&self, value: &T) -> Result<usize, usize> {
         use std::cmp::Ordering;
-        use Element::*;
+        use element::Element::*;
 
         self.ranges.binary_search_by(|member| {
             match (member, value) {
@@ -166,7 +126,7 @@ fn contains_value_on_set_with_no_elements() {
 
 #[test]
 fn contains_value_on_set_with_single_elements() {
-    use Element::*;
+    use element::Element::*;
 
     let rs = RangedSet {
         ranges: vec![Single(1), Single(3)],
@@ -181,7 +141,7 @@ fn contains_value_on_set_with_single_elements() {
 
 #[test]
 fn contains_value_on_set_with_range_elements() {
-    use Element::*;
+    use element::Element::*;
 
     let rs = RangedSet {
         ranges: vec![Range(0..2), Range(5..8)],
@@ -201,7 +161,7 @@ fn contains_value_on_set_with_range_elements() {
 
 #[test]
 fn contains_value_on_set_with_mixed_elements() {
-    use Element::*;
+    use element::Element::*;
 
     let rs = RangedSet {
         ranges: vec![Range(0..2), Single(4)],
@@ -217,7 +177,7 @@ fn contains_value_on_set_with_mixed_elements() {
 
 #[test]
 fn insert_value_on_empty_set() {
-    use Element::*;
+    use element::Element::*;
 
     let mut rs = RangedSet::new();
 
@@ -228,7 +188,7 @@ fn insert_value_on_empty_set() {
 
 #[test]
 fn insert_duplicate_value_on_single_element() {
-    use Element::*;
+    use element::Element::*;
 
     let mut rs = RangedSet::new();
 
@@ -240,7 +200,7 @@ fn insert_duplicate_value_on_single_element() {
 
 #[test]
 fn insert_noncontiguous_value_with_single_elements() {
-    use Element::*;
+    use element::Element::*;
 
     let mut rs = RangedSet::new();
 
@@ -255,7 +215,7 @@ fn insert_noncontiguous_value_with_single_elements() {
 
 #[test]
 fn insert_noncontiguous_value_with_range_elements() {
-    use Element::*;
+    use element::Element::*;
 
     let mut rs = RangedSet {
         ranges: vec![Range(2..4), Range(7..9)],
@@ -270,7 +230,7 @@ fn insert_noncontiguous_value_with_range_elements() {
 
 #[test]
 fn insert_noncontiguous_value_with_mixed_elements() {
-    use Element::*;
+    use element::Element::*;
 
     let mut rs = RangedSet {
         ranges: vec![Single(0), Range(4..6), Single(9)],
@@ -284,7 +244,7 @@ fn insert_noncontiguous_value_with_mixed_elements() {
 
 #[test]
 fn insert_contiguous_value_with_single_elements() {
-    use Element::*;
+    use element::Element::*;
 
     let mut rs = RangedSet {
         ranges: vec![Single(0), Single(4), Single(6), Single(8)],
@@ -299,7 +259,7 @@ fn insert_contiguous_value_with_single_elements() {
 
 #[test]
 fn insert_contiguous_value_with_range_elements() {
-    use Element::*;
+    use element::Element::*;
 
     let mut rs = RangedSet {
         ranges: vec![Range(0..2), Range(5..7), Range(8..10), Range(11..13)],
@@ -314,7 +274,7 @@ fn insert_contiguous_value_with_range_elements() {
 
 #[test]
 fn insert_contiguous_value_with_mixed_elements() {
-    use Element::*;
+    use element::Element::*;
 
     let mut rs = RangedSet {
         ranges: vec![Single(0), Range(2..4), Single(5)],
