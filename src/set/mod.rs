@@ -2,15 +2,15 @@
 mod tests;
 
 use std::clone::Clone;
-use num_traits::PrimInt;
+use step::Step;
 use element::Element;
 use element::Element::*;
 
-pub struct RangedSet<T: PrimInt> {
+pub struct RangedSet<T: Step + Clone + Ord + PartialEq + PartialOrd> {
     ranges: Vec<Element<T>>,
 }
 
-impl<T: PrimInt> RangedSet<T> {
+impl<T: Step + Clone + Ord + PartialEq + PartialOrd> RangedSet<T> {
     pub fn new() -> RangedSet<T> {
         RangedSet {
             ranges: Vec::new(),

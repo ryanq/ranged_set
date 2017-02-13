@@ -19,3 +19,4 @@ appveyor = { repository = "ryanq/ranged_set" }
 
 [dependencies]
 num-traits = "0.1.36"
+step = "0.1.0"
