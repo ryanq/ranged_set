@@ -21,22 +21,11 @@ impl<T: Step + Clone + Ord> From<Range<T>> for Element<T> {
 
 impl<T: Step + Clone + Ord> Element<T> {
     pub fn adjacent_to(&self, value: &T) -> bool {
-        match self {
-            &Element::Single(ref single) if *single < *value => match single.next() {
-                Some(single) => single == *value,
-                None => false,
-            },
-            &Element::Single(ref single) if *value < *single => match single.prev() {
-                Some(single) => single == *value,
-                None => false,
-            },
-            &Element::Single(_) => false,
-            &Element::Range(ref r) if *value == r.end => true,
-            &Element::Range(ref r) if *value < r.start => match r.start.prev() {
-                Some(single) => single == *value,
-                None => false,
-            },
-            &Element::Range(_) => false,
+        match (self.prev(), self.next()) {
+            (Some(ref p), Some(ref n)) => value == p || value == n,
+            (Some(ref p), None) => value == p,
+            (None, Some(ref n)) => value == n,
+            (None, None) => false,
         }
     }
 
@@ -167,6 +156,20 @@ impl<T: Step + Clone + Ord> Element<T> {
                 (false, true) => Element::Range(r.start..v.end),
                 _ => unimplemented!(),
             },
+        }
+    }
+
+    fn next(&self) -> Option<T> {
+        match self {
+            &Element::Single(ref s) => s.next(),
+            &Element::Range(ref r) => Some(r.end.clone()),
+        }
+    }
+
+    fn prev(&self) -> Option<T> {
+        match self {
+            &Element::Single(ref s) => s.prev(),
+            &Element::Range(ref r) => r.start.prev(),
         }
     }
 }
