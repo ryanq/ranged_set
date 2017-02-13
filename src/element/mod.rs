@@ -6,20 +6,20 @@ use std::ops::Range;
 use step::Step;
 
 #[derive(Clone, Debug, PartialEq)]
-pub enum Element<T: Step + Clone + Ord + PartialEq + PartialOrd> {
+pub enum Element<T: Step + Clone + Ord> {
     Single(T),
     Range(Range<T>),
 }
 
-impl<T: Step + Clone + Ord + PartialEq + PartialOrd> From<T> for Element<T> {
+impl<T: Step + Clone + Ord> From<T> for Element<T> {
     fn from(v: T) -> Self { Element::Single(v) }
 }
 
-impl<T: Step + Clone + Ord + PartialEq + PartialOrd> From<Range<T>> for Element<T> {
+impl<T: Step + Clone + Ord> From<Range<T>> for Element<T> {
     fn from(v: Range<T>) -> Self { Element::Range(v) }
 }
 
-impl<T: Step + Clone + Ord + PartialEq + PartialOrd> Element<T> {
+impl<T: Step + Clone + Ord> Element<T> {
     pub fn adjacent_to(&self, value: &T) -> bool {
         match self {
             &Element::Single(ref single) if *single < *value => match single.next() {

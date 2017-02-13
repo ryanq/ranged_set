@@ -6,11 +6,11 @@ use step::Step;
 use element::Element;
 use element::Element::*;
 
-pub struct RangedSet<T: Step + Clone + Ord + PartialEq + PartialOrd> {
+pub struct RangedSet<T: Step + Clone + Ord> {
     ranges: Vec<Element<T>>,
 }
 
-impl<T: Step + Clone + Ord + PartialEq + PartialOrd> RangedSet<T> {
+impl<T: Step + Clone + Ord> RangedSet<T> {
     pub fn new() -> RangedSet<T> {
         RangedSet {
             ranges: Vec::new(),
