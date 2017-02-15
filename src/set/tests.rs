@@ -1,4 +1,5 @@
 use element::Element::*;
+use range_inclusive::RangeInclusive;
 use set::RangedSet;
 
 #[test]
@@ -26,7 +27,7 @@ fn contains_value_on_set_with_single_elements() {
 #[test]
 fn contains_value_on_set_with_range_elements() {
     let rs = RangedSet {
-        ranges: vec![Range(0..2), Range(5..8)],
+        ranges: vec![Range(RangeInclusive::new(0, 1)), Range(RangeInclusive::new(5, 7))],
     };
 
     assert!(rs.contains(&0));
@@ -44,7 +45,7 @@ fn contains_value_on_set_with_range_elements() {
 #[test]
 fn contains_value_on_set_with_mixed_elements() {
     let rs = RangedSet {
-        ranges: vec![Range(0..2), Single(4)],
+        ranges: vec![Range(RangeInclusive::new(0, 1)), Single(4)],
     };
 
     assert!(rs.contains(&0));
@@ -90,26 +91,26 @@ fn insert_noncontiguous_value_with_single_elements() {
 #[test]
 fn insert_noncontiguous_value_with_range_elements() {
     let mut rs = RangedSet {
-        ranges: vec![Range(2..4), Range(7..9)],
+        ranges: vec![Range(RangeInclusive::new(2, 3)), Range(RangeInclusive::new(7, 8))],
     };
 
     assert!(rs.insert(0));
     assert!(rs.insert(5));
     assert!(rs.insert(10));
 
-    assert_eq!(&rs.ranges[..], &[Single(0), Range(2..4), Single(5), Range(7..9), Single(10)]);
+    assert_eq!(&rs.ranges[..], &[Single(0), Range(RangeInclusive::new(2, 3)), Single(5), Range(RangeInclusive::new(7, 8)), Single(10)]);
 }
 
 #[test]
 fn insert_noncontiguous_value_with_mixed_elements() {
     let mut rs = RangedSet {
-        ranges: vec![Single(0), Range(4..6), Single(9)],
+        ranges: vec![Single(0), Range(RangeInclusive::new(4, 5)), Single(9)],
     };
 
     assert!(rs.insert(2));
     assert!(rs.insert(7));
 
-    assert_eq!(&rs.ranges[..], &[Single(0), Single(2), Range(4..6), Single(7), Single(9)]);
+    assert_eq!(&rs.ranges[..], &[Single(0), Single(2), Range(RangeInclusive::new(4, 5)), Single(7), Single(9)]);
 }
 
 #[test]
@@ -122,30 +123,41 @@ fn insert_contiguous_value_with_single_elements() {
     assert!(rs.insert(3));
     assert!(rs.insert(7));
 
-    assert_eq!(&rs.ranges[..], &[Range(0..2), Range(3..5), Range(6..9)]);
+    assert_eq!(&rs.ranges[..], &[Range(RangeInclusive::new(0, 1)), Range(RangeInclusive::new(3, 4)), Range(RangeInclusive::new(6, 8))]);
 }
 
 #[test]
 fn insert_contiguous_value_with_range_elements() {
     let mut rs = RangedSet {
-        ranges: vec![Range(0..2), Range(5..7), Range(8..10), Range(11..13)],
+        ranges: vec![Range(RangeInclusive::new(0, 1)), Range(RangeInclusive::new(5, 6)), Range(RangeInclusive::new(8, 9)), Range(RangeInclusive::new(11, 12))],
     };
 
     assert!(rs.insert(2));
     assert!(rs.insert(4));
     assert!(rs.insert(10));
 
-    assert_eq!(&rs.ranges[..], &[Range(0..3), Range(4..7), Range(8..13)]);
+    assert_eq!(&rs.ranges[..], &[Range(RangeInclusive::new(0, 2)), Range(RangeInclusive::new(4, 6)), Range(RangeInclusive::new(8, 12))]);
 }
 
 #[test]
 fn insert_contiguous_value_with_mixed_elements() {
     let mut rs = RangedSet {
-        ranges: vec![Single(0), Range(2..4), Single(5)],
+        ranges: vec![Single(0), Range(RangeInclusive::new(2, 3)), Single(5)],
     };
 
     assert!(rs.insert(1));
     assert!(rs.insert(4));
 
-    assert_eq!(&rs.ranges[..], &[Range(0..6)]);
+    assert_eq!(&rs.ranges[..], &[Range(RangeInclusive::new(0, 5))]);
+}
+
+#[test]
+fn insert_all_legal_values() {
+    let mut rs: RangedSet<u8> = RangedSet::new();
+
+    for i in 0u16..256 {
+        assert!(rs.insert(i as u8));
+    }
+
+    assert_eq!(&rs.ranges[..], &[Range(RangeInclusive::new(0, 255))]);
 }

@@ -13,6 +13,17 @@ Unreleased
 
 - Tests to verify merging Elements (i.e. single values and ranges).
 
+- Made internal ranges inclusive.
+
+  This makes it possible to do the following (which would have hit an
+  `unimplemented!()` earlier):
+
+  ```rust
+  let mut rs = RangedSet::new();
+  rs.insert(254u8);
+  rs.insert(255);
+  ```
+
 0.2.0 - 2017-02-10
 ------------------
 

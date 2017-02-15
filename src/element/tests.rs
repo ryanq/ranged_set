@@ -1,36 +1,37 @@
 use element::Element::*;
+use range_inclusive::RangeInclusive;
 
 #[test]
 fn merge_number_with_single_element() {
-    assert_eq!(Single(0u8).merge(1), Range(0..2));
-    assert_eq!(Single(1u8).merge(0), Range(0..2));
-    assert_eq!(Single(10u8).merge(9), Range(9..11));
-    assert_eq!(Single(10u8).merge(11), Range(10..12));
-    assert_eq!(Single(253u8).merge(254), Range(253..255));
-    assert_eq!(Single(254u8).merge(253), Range(253..255));
+    assert_eq!(Single(0u8).merge(1), Range(RangeInclusive::new(0,1)));
+    assert_eq!(Single(1u8).merge(0), Range(RangeInclusive::new(0,1)));
+    assert_eq!(Single(10u8).merge(9), Range(RangeInclusive::new(9,10)));
+    assert_eq!(Single(10u8).merge(11), Range(RangeInclusive::new(10,11)));
+    assert_eq!(Single(255u8).merge(254), Range(RangeInclusive::new(254,255)));
+    assert_eq!(Single(254u8).merge(255), Range(RangeInclusive::new(254,255)));
 }
 
 #[test]
 fn merge_number_with_range_element() {
-    assert_eq!(Range(0..2).merge(2), Range(0..3));
-    assert_eq!(Range(10..12).merge(9), Range(9..12));
-    assert_eq!(Range(10..12).merge(12), Range(10..13));
+    assert_eq!(Range(RangeInclusive::new(0,1)).merge(2), Range(RangeInclusive::new(0,2)));
+    assert_eq!(Range(RangeInclusive::new(10,11)).merge(9), Range(RangeInclusive::new(9,11)));
+    assert_eq!(Range(RangeInclusive::new(10,11)).merge(12), Range(RangeInclusive::new(10,12)));
 }
 
 #[test]
 fn merge_range_with_single_element() {
-    assert_eq!(Single(0u8).merge(1..3), Range(0..3));
-    assert_eq!(Single(2u8).merge(0..2), Range(0..3));
-    assert_eq!(Single(10u8).merge(8..10), Range(8..11));
-    assert_eq!(Single(10u8).merge(11..13), Range(10..13));
-    assert_eq!(Single(252u8).merge(253..255), Range(252..255));
-    assert_eq!(Single(254u8).merge(252..254), Range(252..255));
+    assert_eq!(Single(0u8).merge(RangeInclusive::new(1, 2)), Range(RangeInclusive::new(0, 2)));
+    assert_eq!(Single(2u8).merge(RangeInclusive::new(0, 1)), Range(RangeInclusive::new(0, 2)));
+    assert_eq!(Single(10u8).merge(RangeInclusive::new(8, 9)), Range(RangeInclusive::new(8, 10)));
+    assert_eq!(Single(10u8).merge(RangeInclusive::new(11, 12)), Range(RangeInclusive::new(10, 12)));
+    assert_eq!(Single(253u8).merge(RangeInclusive::new(254, 255)), Range(RangeInclusive::new(253, 255)));
+    assert_eq!(Single(255u8).merge(RangeInclusive::new(253, 254)), Range(RangeInclusive::new(253, 255)));
 }
 
 #[test]
 fn merge_range_with_range_element() {
-    assert_eq!(Range(0..2).merge(2..4), Range(0..4));
-    assert_eq!(Range(10..12).merge(8..10), Range(8..12));
-    assert_eq!(Range(10..12).merge(12..14), Range(10..14));
-    assert_eq!(Range(253..255).merge(251..253), Range(251..255));
+    assert_eq!(Range(RangeInclusive::new(0, 1)).merge(RangeInclusive::new(2, 3)), Range(RangeInclusive::new(0, 3)));
+    assert_eq!(Range(RangeInclusive::new(10, 11)).merge(RangeInclusive::new(8, 9)), Range(RangeInclusive::new(8, 11)));
+    assert_eq!(Range(RangeInclusive::new(10, 11)).merge(RangeInclusive::new(12, 13)), Range(RangeInclusive::new(10, 13)));
+    assert_eq!(Range(RangeInclusive::new(254, 255)).merge(RangeInclusive::new(252, 253)), Range(RangeInclusive::new(252, 255)));
 }
