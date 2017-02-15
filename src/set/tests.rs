@@ -212,3 +212,54 @@ fn take_value_on_set_with_mixed_elements() {
 
     assert_eq!(&rs.ranges[..], &[Single(3)]);
 }
+
+#[test]
+fn remove_on_empty_set() {
+    let mut rs = RangedSet::new();
+
+    assert_eq!(rs.remove(&0), false);
+    assert_eq!(rs.remove(&5), false);
+}
+
+#[test]
+fn remove_value_on_set_with_single_elements() {
+    let mut rs = RangedSet {
+        ranges: vec![Single(0), Single(4), Single(6), Single(8)],
+    };
+
+    assert_eq!(rs.remove(&4), true);
+    assert_eq!(rs.remove(&6), true);
+    assert_eq!(rs.remove(&9), false);
+    assert_eq!(rs.remove(&11), false);
+
+    assert_eq!(&rs.ranges[..], &[Single(0), Single(8)]);
+}
+
+#[test]
+fn remove_value_on_set_with_range_elements() {
+    let mut rs = RangedSet {
+        ranges: vec![Range(RangeInclusive::new(0, 1)), Range(RangeInclusive::new(5, 6)), Range(RangeInclusive::new(8, 10))],
+    };
+
+    assert_eq!(rs.remove(&0), true);
+    assert_eq!(rs.remove(&2), false);
+    assert_eq!(rs.remove(&6), true);
+    assert_eq!(rs.remove(&9), true);
+    assert_eq!(rs.remove(&11), false);
+
+    assert_eq!(&rs.ranges[..], &[Single(1), Single(5), Single(8), Single(10)]);
+}
+
+#[test]
+fn remove_value_on_set_with_mixed_elements() {
+    let mut rs = RangedSet {
+        ranges: vec![Single(0), Range(RangeInclusive::new(2, 3)), Single(5)],
+    };
+
+    assert_eq!(rs.remove(&0), true);
+    assert_eq!(rs.remove(&2), true);
+    assert_eq!(rs.remove(&4), false);
+    assert_eq!(rs.remove(&5), true);
+
+    assert_eq!(&rs.ranges[..], &[Single(3)]);
+}

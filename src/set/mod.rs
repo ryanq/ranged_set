@@ -143,6 +143,13 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
         }
     }
 
+    pub fn remove(&mut self, value: &T) -> bool {
+        match self.take(value) {
+            Some(_) => true,
+            None => false,
+        }
+    }
+
     fn find_index_for(&self, value: &T) -> Result<usize, usize> {
         use std::cmp::Ordering;
 
