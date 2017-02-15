@@ -9,6 +9,9 @@ The format is based on [Keep a Changelog] and this project adheres to
 Unreleased
 ----------
 
+0.3.0 - 2017-02-15
+------------------
+
 ### Added
 
 - Tests to verify merging Elements (i.e. single values and ranges).

@@ -18,6 +18,13 @@ Add the crate to the dependencies section of Cargo.toml:
 
 ```toml
 [dependencies]
+ranged_set = "0.3.0"
+```
+
+or, if you want the bleeding edge version:
+
+```toml
+[dependencies]
 ranged_set = { git = "https://github.com/ryanq/ranged_set" }
 ```
 
