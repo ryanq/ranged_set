@@ -105,6 +105,58 @@ impl<T: Step + Clone + Ord> Element<T> {
         }
     }
 
+    pub fn split(&self, value: &T) -> (Option<Self>, T, Option<Self>) {
+        match self {
+            &Element::Range(ref r) => match (value.prev(), value.next()) {
+                (Some(p), Some(n)) => {
+                    let prev = if r.start == p {
+                        Some(Element::Single(p))
+                    } else if r.start > p {
+                        None
+                    } else {
+                        Some(Element::Range(RangeInclusive::new(r.start.clone(), p)))
+                    };
+
+                    let next = if r.end == n {
+                        Some(Element::Single(n))
+                    } else if r.end < n {
+                        None
+                    } else {
+                        Some(Element::Range(RangeInclusive::new(n, r.end.clone())))
+                    };
+
+                    (prev, value.clone(), next)
+                }
+                (Some(p), None) => {
+                    let prev = if r.start == p {
+                        Some(Element::Single(p))
+                    } else if r.start > p {
+                        None
+                    } else {
+                        Some(Element::Range(RangeInclusive::new(r.start.clone(), p)))
+                    };
+                    let next = None;
+
+                    (prev, value.clone(), next)
+                }
+                (None, Some(n)) => {
+                    let prev = None;
+                    let next = if r.end == n {
+                        Some(Element::Single(n))
+                    } else if r.end < n {
+                        None
+                    } else {
+                        Some(Element::Range(RangeInclusive::new(n, r.end.clone())))
+                    };
+
+                    (prev, value.clone(), next)
+                }
+                _ => unreachable!(),
+            },
+            _ => unreachable!(),
+        }
+    }
+
     fn next(&self) -> Option<T> {
         match self {
             &Element::Single(ref s) => s.next(),

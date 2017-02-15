@@ -161,3 +161,54 @@ fn insert_all_legal_values() {
 
     assert_eq!(&rs.ranges[..], &[Range(RangeInclusive::new(0, 255))]);
 }
+
+#[test]
+fn take_on_empty_set() {
+    let mut rs = RangedSet::new();
+
+    assert_eq!(rs.take(&0), None);
+    assert_eq!(rs.take(&5), None);
+}
+
+#[test]
+fn take_value_on_set_with_single_elements() {
+    let mut rs = RangedSet {
+        ranges: vec![Single(0), Single(4), Single(6), Single(8)],
+    };
+
+    assert_eq!(rs.take(&4), Some(4));
+    assert_eq!(rs.take(&6), Some(6));
+    assert_eq!(rs.take(&9), None);
+    assert_eq!(rs.take(&11), None);
+
+    assert_eq!(&rs.ranges[..], &[Single(0), Single(8)]);
+}
+
+#[test]
+fn take_value_on_set_with_range_elements() {
+    let mut rs = RangedSet {
+        ranges: vec![Range(RangeInclusive::new(0, 1)), Range(RangeInclusive::new(5, 6)), Range(RangeInclusive::new(8, 10))],
+    };
+
+    assert_eq!(rs.take(&0), Some(0));
+    assert_eq!(rs.take(&2), None);
+    assert_eq!(rs.take(&6), Some(6));
+    assert_eq!(rs.take(&9), Some(9));
+    assert_eq!(rs.take(&11), None);
+
+    assert_eq!(&rs.ranges[..], &[Single(1), Single(5), Single(8), Single(10)]);
+}
+
+#[test]
+fn take_value_on_set_with_mixed_elements() {
+    let mut rs = RangedSet {
+        ranges: vec![Single(0), Range(RangeInclusive::new(2, 3)), Single(5)],
+    };
+
+    assert_eq!(rs.take(&0), Some(0));
+    assert_eq!(rs.take(&2), Some(2));
+    assert_eq!(rs.take(&4), None);
+    assert_eq!(rs.take(&5), Some(5));
+
+    assert_eq!(&rs.ranges[..], &[Single(3)]);
+}

@@ -92,6 +92,57 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
         }
     }
 
+    pub fn take(&mut self, value: &T) -> Option<T> {
+        enum Operation<T> {
+            Remove(usize),
+            Split(usize, T),
+            NoOp,
+        }
+
+        let operation = {
+            let slot = self.find_index_for(value);
+            match slot {
+                Err(_) => Operation::NoOp,
+                Ok(index) => match self.ranges[index] {
+                    Element::Single(_) => Operation::Remove(index),
+                    Element::Range(_) => Operation::Split(index, value.clone()),
+                }
+            }
+        };
+
+        match operation {
+            Operation::NoOp => None,
+            Operation::Remove(index) => match self.ranges.remove(index) {
+                Element::Single(v) => Some(v),
+                _ => unreachable!(),
+            },
+            Operation::Split(index, value) => match self.ranges[index].clone() {
+                e @ Element::Range(_) => {
+                    let (b, v, a) = e.split(&value);
+                    match (b, a) {
+                        (Some(b), Some(a)) => {
+                            self.ranges.push(a);
+                            let _ = self.ranges.swap_remove(index);
+                            self.ranges.insert(index, b);
+                        }
+                        (None, Some(a)) => {
+                            self.ranges.push(a);
+                            let _ = self.ranges.swap_remove(index);
+                        }
+                        (Some(b), None) => {
+                            self.ranges.push(b);
+                            let _ = self.ranges.swap_remove(index);
+                        }
+                        (None, None) => unreachable!(),
+                    }
+
+                    Some(v)
+                }
+                _ => unreachable!(),
+            }
+        }
+    }
+
     fn find_index_for(&self, value: &T) -> Result<usize, usize> {
         use std::cmp::Ordering;
 

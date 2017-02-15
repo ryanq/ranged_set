@@ -35,3 +35,24 @@ fn merge_range_with_range_element() {
     assert_eq!(Range(RangeInclusive::new(10, 11)).merge(RangeInclusive::new(12, 13)), Range(RangeInclusive::new(10, 13)));
     assert_eq!(Range(RangeInclusive::new(254, 255)).merge(RangeInclusive::new(252, 253)), Range(RangeInclusive::new(252, 255)));
 }
+
+#[test]
+fn split_range_with_two_elements() {
+    assert_eq!(Range(RangeInclusive::new(0, 1)).split(&0), (None, 0, Some(Single(1))));
+    assert_eq!(Range(RangeInclusive::new(0, 1)).split(&1), (Some(Single(0)), 1, None));
+}
+
+#[test]
+fn split_range_with_three_elements() {
+    assert_eq!(Range(RangeInclusive::new(0, 2)).split(&0), (None, 0, Some(Range(RangeInclusive::new(1, 2)))));
+    assert_eq!(Range(RangeInclusive::new(0, 2)).split(&1), (Some(Single(0)), 1, Some(Single(2))));
+    assert_eq!(Range(RangeInclusive::new(0, 2)).split(&2), (Some(Range(RangeInclusive::new(0, 1))), 2, None));
+}
+
+#[test]
+fn split_range_with_more_elements() {
+    assert_eq!(Range(RangeInclusive::new(0, 3)).split(&0), (None, 0, Some(Range(RangeInclusive::new(1, 3)))));
+    assert_eq!(Range(RangeInclusive::new(0, 3)).split(&1), (Some(Single(0)), 1, Some(Range(RangeInclusive::new(2, 3)))));
+    assert_eq!(Range(RangeInclusive::new(0, 3)).split(&2), (Some(Range(RangeInclusive::new(0, 1))), 2, Some(Single(3))));
+    assert_eq!(Range(RangeInclusive::new(0, 3)).split(&3), (Some(Range(RangeInclusive::new(0, 2))), 3, None));
+}
