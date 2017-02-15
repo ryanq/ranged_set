@@ -99,7 +99,7 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
             match (member, value) {
                 (&Single(ref s), v) => s.cmp(v),
                 (&Range(ref r), v) => {
-                    if r.end <= *v {
+                    if r.end < *v {
                         Ordering::Less
                     } else if *v < r.start {
                         Ordering::Greater
