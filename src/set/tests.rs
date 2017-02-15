@@ -150,3 +150,14 @@ fn insert_contiguous_value_with_mixed_elements() {
 
     assert_eq!(&rs.ranges[..], &[Range(RangeInclusive::new(0, 5))]);
 }
+
+#[test]
+fn insert_all_legal_values() {
+    let mut rs: RangedSet<u8> = RangedSet::new();
+
+    for i in 0u16..256 {
+        assert!(rs.insert(i as u8));
+    }
+
+    assert_eq!(&rs.ranges[..], &[Range(RangeInclusive::new(0, 255))]);
+}
