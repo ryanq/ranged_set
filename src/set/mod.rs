@@ -6,17 +6,50 @@ use step::Step;
 use element::Element;
 use element::Element::*;
 
+/// A set that stores values in contiguous ranges
+///
+/// `RangedSet` stores numeric values (or values that implement the
+/// [`Step`] trait) in ranges to conserve space.
+///
+/// # When is using `RangedSet` a good idea?
+///
+/// `RangedSet` should be used when you need to store a lot of values
+/// that are contiguous. The example given in the module stored values
+/// whose Collatz sequence converged. It iterated from 1 up to
+/// `u64::MAX` and stored values it that converged in a cache. Most of
+/// these numbers are contiguous. Definitely all the values below the
+/// current number do.
+///
+/// # Example
+///
+/// ```rust
+/// use ranged_set::RangedSet;
+///
+/// let mut rs = RangedSet::new();
+///
+/// for i in 0..65_535 {
+///     rs.insert(i);
+/// }
+///
+/// // There's no way to check here in the code, but the memory consumed
+/// // here should be enough for a Vec<i32>, an enum discriminant, and
+/// // two i32's.
+/// ```
+///
+/// [`Step`]: https://docs.rs/step/0.1.0/step/
 pub struct RangedSet<T: Step + Clone + Ord> {
     ranges: Vec<Element<T>>,
 }
 
 impl<T: Step + Clone + Ord> RangedSet<T> {
+    /// Returns a new empty set
     pub fn new() -> RangedSet<T> {
         RangedSet {
             ranges: Vec::new(),
         }
     }
 
+    /// Returns `true` if the set contains a value.
     pub fn contains(&self, value: &T) -> bool {
         match self.find_index_for(value) {
             Ok(_) => true,
@@ -24,6 +57,10 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
         }
     }
 
+    /// Adds a value to the set
+    ///
+    /// If the set did not have this value present, `true` is returned.
+    /// If the set did have this value present, `false` is returned.
     pub fn insert(&mut self, value: T) -> bool {
         enum Operation<T> {
             InsertSingle(usize, T),
@@ -92,6 +129,7 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
         }
     }
 
+    /// Removes and returns a value from the set
     pub fn take(&mut self, value: &T) -> Option<T> {
         enum Operation<T> {
             Remove(usize),
@@ -143,6 +181,10 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
         }
     }
 
+    /// Removes a value from the set
+    ///
+    /// Removes a value from the set. Returns `true` if the value was
+    /// present in the set.
     pub fn remove(&mut self, value: &T) -> bool {
         match self.take(value) {
             Some(_) => true,
