@@ -43,6 +43,13 @@ pub struct RangedSet<T: Step + Clone + Ord> {
 
 impl<T: Step + Clone + Ord> RangedSet<T> {
     /// Returns a new empty set
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use ranged_set::RangedSet;
+    /// let mut set: RangedSet<i32> = RangedSet::new();
+    /// ```
     pub fn new() -> RangedSet<T> {
         RangedSet {
             ranges: Vec::new(),
@@ -50,6 +57,20 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
     }
 
     /// Returns `true` if the set contains a value.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use ranged_set::RangedSet;
+    ///
+    /// let mut set = RangedSet::new();
+    /// set.insert(0);
+    /// set.insert(1);
+    /// set.insert(2);
+    ///
+    /// assert_eq!(set.contains(&0), true);
+    /// assert_eq!(set.contains(&3), false);
+    /// ```
     pub fn contains(&self, value: &T) -> bool {
         match self.find_index_for(value) {
             Ok(_) => true,
@@ -61,6 +82,16 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
     ///
     /// If the set did not have this value present, `true` is returned.
     /// If the set did have this value present, `false` is returned.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use ranged_set::RangedSet;
+    ///
+    /// let mut set = RangedSet::new();
+    /// assert_eq!(set.insert(1), true);
+    /// assert_eq!(set.insert(1), false);
+    /// ```
     pub fn insert(&mut self, value: T) -> bool {
         enum Operation<T> {
             InsertSingle(usize, T),
@@ -130,6 +161,20 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
     }
 
     /// Removes and returns a value from the set
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use ranged_set::RangedSet;
+    ///
+    /// let mut set = RangedSet::new();
+    /// set.insert(0);
+    /// set.insert(1);
+    /// set.insert(2);
+    ///
+    /// assert_eq!(set.take(&0), Some(0));
+    /// assert_eq!(set.take(&5), None);
+    /// ```
     pub fn take(&mut self, value: &T) -> Option<T> {
         enum Operation<T> {
             Remove(usize),
@@ -185,6 +230,20 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
     ///
     /// Removes a value from the set. Returns `true` if the value was
     /// present in the set.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use ranged_set::RangedSet;
+    ///
+    /// let mut set = RangedSet::new();
+    /// set.insert(0);
+    /// set.insert(1);
+    /// set.insert(2);
+    ///
+    /// assert_eq!(set.remove(&0), true);
+    /// assert_eq!(set.remove(&5), false);
+    /// ```
     pub fn remove(&mut self, value: &T) -> bool {
         match self.take(value) {
             Some(_) => true,
