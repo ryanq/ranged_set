@@ -18,7 +18,7 @@ Add the crate to the dependencies section of Cargo.toml:
 
 ```toml
 [dependencies]
-ranged_set = "0.3.0"
+ranged_set = "0.4.0"
 ```
 
 or, if you want the bleeding edge version:

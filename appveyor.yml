@@ -2,7 +2,7 @@
 # installation (taken from https://github.com/starkat99/appveyor-rust)
 
 os: Visual Studio 2015
-version: 0.2.0.{build}-{branch}
+version: 0.4.0.{build}-{branch}
 
 skip_commits:
   message: /\[(skip ci|ci skip)\]/

@@ -9,6 +9,16 @@ The format is based on [Keep a Changelog] and this project adheres to
 Unreleased
 ----------
 
+0.4.0 - 2017-02-16
+------------------
+
+### Added
+
+- Documentation for all public symbols and the crate as a whole.
+
+- `RangedSet::remove()` and `RangedSet::take()` functions to remove
+  values (and maybe return them).
+
 0.3.0 - 2017-02-15
 ------------------
 
