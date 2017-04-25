@@ -1,6 +1,6 @@
 [package]
 name = "ranged_set"
-version = "0.4.0"
+version = "0.4.1"
 authors = ["Ryan Quattlebaum <ryan.quattlebaum@icloud.com>"]
 
 description = "A set that stores contiguous values as a range. Designed to be used with numeric types."
