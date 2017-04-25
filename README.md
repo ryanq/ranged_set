@@ -57,4 +57,4 @@ assert!(set.contains(&0));
 [appveyor-ci]: https://ci.appveyor.com/project/ryanq/ranged-set
 [crates.io-badge]: https://img.shields.io/crates/v/ranged_set.svg
 [crates.io]: https://crates.io/crates/ranged_set
-[docs.rs]: https://docs.rs/ranged_set/0.2.0/ranged_set/
+[docs.rs]: https://docs.rs/ranged_set/

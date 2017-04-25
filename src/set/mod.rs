@@ -37,6 +37,7 @@ use element::Element::*;
 /// ```
 ///
 /// [`Step`]: https://docs.rs/step/0.1.0/step/
+#[derive(Debug)]
 pub struct RangedSet<T: Step + Clone + Ord> {
     ranges: Vec<Element<T>>,
 }
