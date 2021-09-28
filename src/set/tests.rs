@@ -1,6 +1,6 @@
-use element::Element::*;
-use range_inclusive::RangeInclusive;
-use set::RangedSet;
+use crate::element::Element::*;
+use crate::range_inclusive::RangeInclusive;
+use crate::set::RangedSet;
 
 #[test]
 fn contains_value_on_set_with_no_elements() {
