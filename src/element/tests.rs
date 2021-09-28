@@ -1,5 +1,5 @@
-use element::Element::*;
-use range_inclusive::RangeInclusive;
+use crate::element::Element::*;
+use crate::range_inclusive::RangeInclusive;
 
 #[test]
 fn merge_number_with_single_element() {

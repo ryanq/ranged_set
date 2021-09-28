@@ -2,6 +2,7 @@
 name = "ranged_set"
 version = "0.4.1"
 authors = ["Ryan Quattlebaum <ryan.quattlebaum@icloud.com>"]
+edition = "2018"
 
 description = "A set that stores contiguous values as a range. Designed to be used with numeric types."
 keywords = ["set"]

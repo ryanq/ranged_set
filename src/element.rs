@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests;
 
-use range_inclusive::RangeInclusive;
+use crate::range_inclusive::RangeInclusive;
 use std::cmp::Ordering;
 use step::Step;
 
@@ -37,7 +37,7 @@ impl<T: Step + Clone + Ord> Element<T> {
     where
         S: Into<Self>,
     {
-        use element::Element::*;
+        use crate::element::Element::*;
         let v = value.into();
 
         match (self, v) {

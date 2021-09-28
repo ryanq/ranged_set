@@ -1,8 +1,8 @@
 #[cfg(test)]
 mod tests;
 
-use element::Element;
-use element::Element::*;
+use crate::element::Element;
+use crate::element::Element::*;
 use std::clone::Clone;
 use step::Step;
 
