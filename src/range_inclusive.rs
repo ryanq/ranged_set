@@ -6,9 +6,6 @@ pub struct RangeInclusive<I> {
 
 impl<I> RangeInclusive<I> {
     pub fn new(s: I, e: I) -> Self {
-        RangeInclusive {
-            start: s,
-            end: e,
-        }
+        RangeInclusive { start: s, end: e }
     }
 }
