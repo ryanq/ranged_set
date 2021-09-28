@@ -37,7 +37,7 @@ use element::Element::*;
 /// ```
 ///
 /// [`Step`]: https://docs.rs/step/0.1.0/step/
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct RangedSet<T: Step + Clone + Ord> {
     ranges: Vec<Element<T>>,
 }
@@ -73,10 +73,7 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
     /// assert_eq!(set.contains(&3), false);
     /// ```
     pub fn contains(&self, value: &T) -> bool {
-        match self.find_index_for(value) {
-            Ok(_) => true,
-            Err(_) => false,
-        }
+        self.find_index_for(value).is_ok()
     }
 
     /// Adds a value to the set
@@ -246,10 +243,7 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
     /// assert_eq!(set.remove(&5), false);
     /// ```
     pub fn remove(&mut self, value: &T) -> bool {
-        match self.take(value) {
-            Some(_) => true,
-            None => false,
-        }
+        self.take(value).is_some()
     }
 
     fn find_index_for(&self, value: &T) -> Result<usize, usize> {
