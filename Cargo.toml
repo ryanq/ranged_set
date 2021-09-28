@@ -18,5 +18,5 @@ travis-ci = { repository = "ryanq/ranged_set" }
 appveyor = { repository = "ryanq/ranged_set" }
 
 [dependencies]
-num-traits = "0.1.36"
-step = "0.1.0"
+num-traits = "0.2.14"
+step = "0.2.0"
