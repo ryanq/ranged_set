@@ -1,8 +1,7 @@
 `ranged_set`
 ============
 
-[![Build Status][travis-badge]][travis-ci]
-[![Build status][appveyor-badge]][appveyor-ci]
+[![Rust](https://github.com/ryanq/ranged_set/actions/workflows/rust.yml/badge.svg?branch=master)](https://github.com/ryanq/ranged_set/actions/workflows/rust.yml)
 [![Crate on crates.io][crates.io-badge]][crates.io]
 
 `ranged_set` is a crate that provides the type `RangedSet<T>`, which
