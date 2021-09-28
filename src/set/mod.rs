@@ -1,10 +1,10 @@
 #[cfg(test)]
 mod tests;
 
-use std::clone::Clone;
-use step::Step;
 use element::Element;
 use element::Element::*;
+use std::clone::Clone;
+use step::Step;
 
 /// A set that stores values in contiguous ranges
 ///
@@ -52,9 +52,7 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
     /// let mut set: RangedSet<i32> = RangedSet::new();
     /// ```
     pub fn new() -> RangedSet<T> {
-        RangedSet {
-            ranges: Vec::new(),
-        }
+        RangedSet { ranges: Vec::new() }
     }
 
     /// Returns `true` if the set contains a value.
@@ -116,14 +114,30 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
                     let after = self.ranges.get(index);
                     match (before, after) {
                         (None, None) => Operation::InsertSingle(index, value),
-                        (Some(b), None) if !b.adjacent_to(&value) => Operation::InsertSingle(index, value),
-                        (None, Some(a)) if !a.adjacent_to(&value) => Operation::InsertSingle(index, value),
-                        (Some(b), None) if b.adjacent_to(&value) => Operation::TwoWayMerge(index - 1, value),
-                        (None, Some(a)) if a.adjacent_to(&value) => Operation::TwoWayMerge(index, value),
-                        (Some(b), Some(a)) if !b.adjacent_to(&value) && !a.adjacent_to(&value) => Operation::InsertSingle(index, value),
-                        (Some(b), Some(a)) if b.adjacent_to(&value) && !a.adjacent_to(&value) => Operation::TwoWayMerge(index - 1, value),
-                        (Some(b), Some(a)) if !b.adjacent_to(&value) && a.adjacent_to(&value) => Operation::TwoWayMerge(index, value),
-                        (Some(b), Some(a)) if b.adjacent_to(&value) && a.adjacent_to(&value) => Operation::ThreeWayMerge(index - 1, index, value),
+                        (Some(b), None) if !b.adjacent_to(&value) => {
+                            Operation::InsertSingle(index, value)
+                        }
+                        (None, Some(a)) if !a.adjacent_to(&value) => {
+                            Operation::InsertSingle(index, value)
+                        }
+                        (Some(b), None) if b.adjacent_to(&value) => {
+                            Operation::TwoWayMerge(index - 1, value)
+                        }
+                        (None, Some(a)) if a.adjacent_to(&value) => {
+                            Operation::TwoWayMerge(index, value)
+                        }
+                        (Some(b), Some(a)) if !b.adjacent_to(&value) && !a.adjacent_to(&value) => {
+                            Operation::InsertSingle(index, value)
+                        }
+                        (Some(b), Some(a)) if b.adjacent_to(&value) && !a.adjacent_to(&value) => {
+                            Operation::TwoWayMerge(index - 1, value)
+                        }
+                        (Some(b), Some(a)) if !b.adjacent_to(&value) && a.adjacent_to(&value) => {
+                            Operation::TwoWayMerge(index, value)
+                        }
+                        (Some(b), Some(a)) if b.adjacent_to(&value) && a.adjacent_to(&value) => {
+                            Operation::ThreeWayMerge(index - 1, index, value)
+                        }
                         _ => unimplemented!(),
                     }
                 }
@@ -187,7 +201,7 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
                 Ok(index) => match self.ranges[index] {
                     Element::Single(_) => Operation::Remove(index),
                     Element::Range(_) => Operation::Split(index, value.clone()),
-                }
+                },
             }
         };
 
@@ -220,7 +234,7 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
                     Some(v)
                 }
                 _ => unreachable!(),
-            }
+            },
         }
     }
 
@@ -249,8 +263,8 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
     fn find_index_for(&self, value: &T) -> Result<usize, usize> {
         use std::cmp::Ordering;
 
-        self.ranges.binary_search_by(|member| {
-            match (member, value) {
+        self.ranges
+            .binary_search_by(|member| match (member, value) {
                 (&Single(ref s), v) => s.cmp(v),
                 (&Range(ref r), v) => {
                     if r.end < *v {
@@ -261,7 +275,6 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
                         Ordering::Equal
                     }
                 }
-            }
-        })
+            })
     }
 }

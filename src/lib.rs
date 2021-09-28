@@ -18,10 +18,10 @@
 //! use ranged_set::RangedSet;
 //!
 //! fn collatz(number: u64) -> u64 {
-//!    match number % 2 == 0 {
-//!        false => 3 * number + 1,
-//!        true => number / 2,
-//!    }
+//!     match number % 2 == 0 {
+//!         false => 3 * number + 1,
+//!         true => number / 2,
+//!     }
 //! }
 //!
 //! fn main() {
