@@ -109,28 +109,20 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
             Err(index) => index,
         };
 
-        let before = index.checked_sub(1).and_then(|i| self.ranges.get(i));
-        let after = self.ranges.get(index);
+        let before = match index.checked_sub(1).and_then(|i| self.ranges.get(i)) {
+            Some(b) => b.adjacent_to(&value),
+            None => false,
+        };
+        let after = match self.ranges.get(index) {
+            Some(a) => a.adjacent_to(&value),
+            None => false,
+        };
 
         let operation = match (before, after) {
-            (None, None) => Operation::InsertSingle(index, value),
-            (Some(b), None) if !b.adjacent_to(&value) => Operation::InsertSingle(index, value),
-            (None, Some(a)) if !a.adjacent_to(&value) => Operation::InsertSingle(index, value),
-            (Some(b), None) if b.adjacent_to(&value) => Operation::TwoWayMerge(index - 1, value),
-            (None, Some(a)) if a.adjacent_to(&value) => Operation::TwoWayMerge(index, value),
-            (Some(b), Some(a)) if !b.adjacent_to(&value) && !a.adjacent_to(&value) => {
-                Operation::InsertSingle(index, value)
-            }
-            (Some(b), Some(a)) if b.adjacent_to(&value) && !a.adjacent_to(&value) => {
-                Operation::TwoWayMerge(index - 1, value)
-            }
-            (Some(b), Some(a)) if !b.adjacent_to(&value) && a.adjacent_to(&value) => {
-                Operation::TwoWayMerge(index, value)
-            }
-            (Some(b), Some(a)) if b.adjacent_to(&value) && a.adjacent_to(&value) => {
-                Operation::ThreeWayMerge(index - 1, index, value)
-            }
-            _ => unimplemented!(),
+            (false, false) => Operation::InsertSingle(index, value),
+            (true, false) => Operation::TwoWayMerge(index - 1, value),
+            (false, true) => Operation::TwoWayMerge(index, value),
+            (true, true) => Operation::ThreeWayMerge(index - 1, index, value),
         };
 
         match operation {
