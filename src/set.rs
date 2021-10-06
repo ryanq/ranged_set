@@ -263,18 +263,17 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
     fn find_index_for(&self, value: &T) -> Result<usize, usize> {
         use std::cmp::Ordering;
 
-        self.ranges
-            .binary_search_by(|member| match (member, value) {
-                (&Single(ref s), v) => s.cmp(v),
-                (&Range(ref r), v) => {
-                    if r.end < *v {
-                        Ordering::Less
-                    } else if *v < r.start {
-                        Ordering::Greater
-                    } else {
-                        Ordering::Equal
-                    }
+        self.ranges.binary_search_by(|member| match member {
+            Single(s) => s.cmp(value),
+            Range(r) => {
+                if r.end < *value {
+                    Ordering::Less
+                } else if *value < r.start {
+                    Ordering::Greater
+                } else {
+                    Ordering::Equal
                 }
-            })
+            }
+        })
     }
 }
