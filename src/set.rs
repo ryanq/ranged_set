@@ -93,59 +93,47 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
             InsertSingle(usize, T),
             TwoWayMerge(usize, T),
             ThreeWayMerge(usize, usize, T),
-            NoOp,
         }
 
-        let operation = {
-            let slot = self.find_index_for(&value);
-            match slot {
-                // The value is already contained in the element at the
-                // index returned in the Ok() value, so nothing needs
-                // doing.
-                Ok(_) => Operation::NoOp,
+        let index = match self.find_index_for(&value) {
+            // The value is already contained in the element at the
+            // index returned in the Ok() value, so nothing needs
+            // doing.
+            Ok(_) => return false,
 
-                // The value wasn't found, so the index contained in the
-                // Err() value is where to insert it to maintain sort
-                // order. The value needs to be added to the list of
-                // elements, either as a single value or by merging with
-                // another element.
-                Err(index) => {
-                    let before = index.checked_sub(1).and_then(|i| self.ranges.get(i));
-                    let after = self.ranges.get(index);
-                    match (before, after) {
-                        (None, None) => Operation::InsertSingle(index, value),
-                        (Some(b), None) if !b.adjacent_to(&value) => {
-                            Operation::InsertSingle(index, value)
-                        }
-                        (None, Some(a)) if !a.adjacent_to(&value) => {
-                            Operation::InsertSingle(index, value)
-                        }
-                        (Some(b), None) if b.adjacent_to(&value) => {
-                            Operation::TwoWayMerge(index - 1, value)
-                        }
-                        (None, Some(a)) if a.adjacent_to(&value) => {
-                            Operation::TwoWayMerge(index, value)
-                        }
-                        (Some(b), Some(a)) if !b.adjacent_to(&value) && !a.adjacent_to(&value) => {
-                            Operation::InsertSingle(index, value)
-                        }
-                        (Some(b), Some(a)) if b.adjacent_to(&value) && !a.adjacent_to(&value) => {
-                            Operation::TwoWayMerge(index - 1, value)
-                        }
-                        (Some(b), Some(a)) if !b.adjacent_to(&value) && a.adjacent_to(&value) => {
-                            Operation::TwoWayMerge(index, value)
-                        }
-                        (Some(b), Some(a)) if b.adjacent_to(&value) && a.adjacent_to(&value) => {
-                            Operation::ThreeWayMerge(index - 1, index, value)
-                        }
-                        _ => unimplemented!(),
-                    }
-                }
+            // The value wasn't found, so the index contained in the
+            // Err() value is where to insert it to maintain sort
+            // order. The value needs to be added to the list of
+            // elements, either as a single value or by merging with
+            // another element.
+            Err(index) => index,
+        };
+
+        let before = index.checked_sub(1).and_then(|i| self.ranges.get(i));
+        let after = self.ranges.get(index);
+
+        let operation = match (before, after) {
+            (None, None) => Operation::InsertSingle(index, value),
+            (Some(b), None) if !b.adjacent_to(&value) => Operation::InsertSingle(index, value),
+            (None, Some(a)) if !a.adjacent_to(&value) => Operation::InsertSingle(index, value),
+            (Some(b), None) if b.adjacent_to(&value) => Operation::TwoWayMerge(index - 1, value),
+            (None, Some(a)) if a.adjacent_to(&value) => Operation::TwoWayMerge(index, value),
+            (Some(b), Some(a)) if !b.adjacent_to(&value) && !a.adjacent_to(&value) => {
+                Operation::InsertSingle(index, value)
             }
+            (Some(b), Some(a)) if b.adjacent_to(&value) && !a.adjacent_to(&value) => {
+                Operation::TwoWayMerge(index - 1, value)
+            }
+            (Some(b), Some(a)) if !b.adjacent_to(&value) && a.adjacent_to(&value) => {
+                Operation::TwoWayMerge(index, value)
+            }
+            (Some(b), Some(a)) if b.adjacent_to(&value) && a.adjacent_to(&value) => {
+                Operation::ThreeWayMerge(index - 1, index, value)
+            }
+            _ => unimplemented!(),
         };
 
         match operation {
-            Operation::NoOp => false,
             Operation::InsertSingle(index, value) => {
                 self.ranges.insert(index, Single(value));
                 true
