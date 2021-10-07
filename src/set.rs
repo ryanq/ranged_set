@@ -171,22 +171,19 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
         enum Operation<T> {
             Remove(usize),
             Split(usize, T),
-            NoOp,
         }
 
-        let operation = {
-            let slot = self.find_index_for(value);
-            match slot {
-                Err(_) => Operation::NoOp,
-                Ok(index) => match self.ranges[index] {
-                    Element::Single(_) => Operation::Remove(index),
-                    Element::Range(_) => Operation::Split(index, value.clone()),
-                },
-            }
+        let index = match self.find_index_for(value) {
+            Ok(index) => index,
+            Err(_) => return None,
+        };
+
+        let operation = match self.ranges[index] {
+            Element::Single(_) => Operation::Remove(index),
+            Element::Range(_) => Operation::Split(index, value.clone()),
         };
 
         match operation {
-            Operation::NoOp => None,
             Operation::Remove(index) => match self.ranges.remove(index) {
                 Element::Single(v) => Some(v),
                 _ => unreachable!(),
