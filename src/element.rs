@@ -37,7 +37,7 @@ impl<T: Step + Clone + Ord> Element<T> {
     where
         S: Into<Self>,
     {
-        use crate::element::Element::*;
+        use crate::element::Element::{Range, Single};
         let v = value.into();
 
         match (self, v) {
@@ -48,14 +48,20 @@ impl<T: Step + Clone + Ord> Element<T> {
                     (false, false) => unimplemented!(),
                     (true, true) => unreachable!(),
                 },
-                (Some(p), None) => match v == p {
-                    true => Range(RangeInclusive::new(v, s)),
-                    false => unimplemented!(),
-                },
-                (None, Some(n)) => match v == n {
-                    true => Range(RangeInclusive::new(s, v)),
-                    false => unimplemented!(),
-                },
+                (Some(p), None) => {
+                    if v == p {
+                        Range(RangeInclusive::new(v, s))
+                    } else {
+                        unimplemented!()
+                    }
+                }
+                (None, Some(n)) => {
+                    if v == n {
+                        Range(RangeInclusive::new(s, v))
+                    } else {
+                        unimplemented!()
+                    }
+                }
                 (None, None) => unimplemented!(),
             },
             (Single(s), Range(v)) => match (s.prev(), s.next()) {
@@ -65,14 +71,20 @@ impl<T: Step + Clone + Ord> Element<T> {
                     (false, false) => unimplemented!(),
                     (true, true) => unreachable!(),
                 },
-                (Some(p), None) => match v.end == p {
-                    true => Range(RangeInclusive::new(v.start, s)),
-                    false => unimplemented!(),
-                },
-                (None, Some(n)) => match v.start == n {
-                    true => Range(RangeInclusive::new(s, v.end)),
-                    false => unimplemented!(),
-                },
+                (Some(p), None) => {
+                    if v.end == p {
+                        Range(RangeInclusive::new(v.start, s))
+                    } else {
+                        unimplemented!()
+                    }
+                }
+                (None, Some(n)) => {
+                    if v.start == n {
+                        Range(RangeInclusive::new(s, v.end))
+                    } else {
+                        unimplemented!()
+                    }
+                }
                 (None, None) => unimplemented!(),
             },
             (Range(r), Single(v)) => match (r.start.prev(), r.end.next()) {
@@ -82,14 +94,20 @@ impl<T: Step + Clone + Ord> Element<T> {
                     (false, false) => unimplemented!(),
                     (true, true) => unreachable!(),
                 },
-                (Some(p), None) => match v == p {
-                    true => Range(RangeInclusive::new(v, r.end)),
-                    false => unimplemented!(),
-                },
-                (None, Some(n)) => match v == n {
-                    true => Range(RangeInclusive::new(r.start, v)),
-                    false => unimplemented!(),
-                },
+                (Some(p), None) => {
+                    if v == p {
+                        Range(RangeInclusive::new(v, r.end))
+                    } else {
+                        unimplemented!()
+                    }
+                }
+                (None, Some(n)) => {
+                    if v == n {
+                        Range(RangeInclusive::new(r.start, v))
+                    } else {
+                        unimplemented!()
+                    }
+                }
                 (None, None) => unimplemented!(),
             },
             (Range(r), Range(v)) => match (r.start.prev(), r.end.next()) {
@@ -99,14 +117,20 @@ impl<T: Step + Clone + Ord> Element<T> {
                     (false, false) => unimplemented!(),
                     (true, true) => unreachable!(),
                 },
-                (Some(p), None) => match v.end == p {
-                    true => Range(RangeInclusive::new(v.start, r.end)),
-                    false => unimplemented!(),
-                },
-                (None, Some(n)) => match v.start == n {
-                    true => Range(RangeInclusive::new(r.start, v.end)),
-                    false => unimplemented!(),
-                },
+                (Some(p), None) => {
+                    if v.end == p {
+                        Range(RangeInclusive::new(v.start, r.end))
+                    } else {
+                        unimplemented!()
+                    }
+                }
+                (None, Some(n)) => {
+                    if v.start == n {
+                        Range(RangeInclusive::new(r.start, v.end))
+                    } else {
+                        unimplemented!()
+                    }
+                }
                 (None, None) => unimplemented!(),
             },
         }
@@ -162,7 +186,7 @@ impl<T: Step + Clone + Ord> Element<T> {
                 }
                 _ => unreachable!(),
             },
-            _ => unreachable!(),
+            Element::Single(_) => unreachable!(),
         }
     }
 
