@@ -1,4 +1,4 @@
-use crate::element::Element::*;
+use crate::element::Element::{Range, Single};
 use crate::range_inclusive::RangeInclusive;
 
 #[test]

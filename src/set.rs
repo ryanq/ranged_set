@@ -2,7 +2,6 @@
 mod tests;
 
 use crate::element::Element;
-use crate::element::Element::*;
 use std::clone::Clone;
 use step::Step;
 
@@ -127,7 +126,7 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
 
         match operation {
             Operation::InsertSingle(index, value) => {
-                self.ranges.insert(index, Single(value));
+                self.ranges.insert(index, Element::Single(value));
                 true
             }
             Operation::TwoWayMerge(index, value) => {
@@ -173,10 +172,7 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
             Split(usize, T),
         }
 
-        let index = match self.find_index_for(value) {
-            Ok(index) => index,
-            Err(_) => return None,
-        };
+        let index = self.find_index_for(value).ok()?;
 
         let operation = match self.ranges[index] {
             Element::Single(_) => Operation::Remove(index),
@@ -186,7 +182,7 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
         match operation {
             Operation::Remove(index) => match self.ranges.remove(index) {
                 Element::Single(v) => Some(v),
-                _ => unreachable!(),
+                Element::Range(_) => unreachable!(),
             },
             Operation::Split(index, value) => match self.ranges[index].clone() {
                 e @ Element::Range(_) => {
@@ -241,8 +237,8 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
         use std::cmp::Ordering;
 
         self.ranges.binary_search_by(|member| match member {
-            Single(s) => s.cmp(value),
-            Range(r) => {
+            Element::Single(s) => s.cmp(value),
+            Element::Range(r) => {
                 if r.end < *value {
                     Ordering::Less
                 } else if *value < r.start {
