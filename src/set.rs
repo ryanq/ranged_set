@@ -134,7 +134,7 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
                 let merged = existing.merge(value);
 
                 self.ranges.push(merged);
-                let _ = self.ranges.swap_remove(index);
+                self.ranges.swap_remove(index);
                 true
             }
             Operation::ThreeWayMerge(index_before, index_after, value) => {
@@ -144,8 +144,8 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
                 let merged = merged_before.merge(after);
 
                 self.ranges.push(merged);
-                let _ = self.ranges.swap_remove(index_before);
-                let _ = self.ranges.remove(index_after);
+                self.ranges.swap_remove(index_before);
+                self.ranges.remove(index_after);
                 true
             }
         }
@@ -190,16 +190,16 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
                     match (b, a) {
                         (Some(b), Some(a)) => {
                             self.ranges.push(a);
-                            let _ = self.ranges.swap_remove(index);
+                            self.ranges.swap_remove(index);
                             self.ranges.insert(index, b);
                         }
                         (None, Some(a)) => {
                             self.ranges.push(a);
-                            let _ = self.ranges.swap_remove(index);
+                            self.ranges.swap_remove(index);
                         }
                         (Some(b), None) => {
                             self.ranges.push(b);
-                            let _ = self.ranges.swap_remove(index);
+                            self.ranges.swap_remove(index);
                         }
                         (None, None) => unreachable!(),
                     }
