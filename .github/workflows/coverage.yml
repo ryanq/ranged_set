@@ -20,10 +20,13 @@ jobs:
           profile: minimal
           override: true
 
-      - name: Run cargo-tarpaulin
-        uses: actions-rs/tarpaulin@v0.1
-        with:
-          args: "--all-features"
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
 
-      - name: Upload to codecov.io
-        uses: codecov/codecov-action@v3.1.0
+      - name: Run llvm-cov
+        run: cargo llvm-cov --all-features --doctests --workspace --lcov --output-path lcov.info
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: lcov.info
