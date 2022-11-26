@@ -13,13 +13,13 @@ pub enum Element<T: Step + Clone + Ord> {
 
 impl<T: Step + Clone + Ord> From<T> for Element<T> {
     fn from(v: T) -> Self {
-        Element::Single(v)
+        Self::Single(v)
     }
 }
 
 impl<T: Step + Clone + Ord> From<RangeInclusive<T>> for Element<T> {
     fn from(v: RangeInclusive<T>) -> Self {
-        Element::Range(v)
+        Self::Range(v)
     }
 }
 
@@ -90,21 +90,21 @@ impl<T: Step + Clone + Ord> Element<T> {
 
     pub fn split(&self, value: &T) -> (Option<Self>, T, Option<Self>) {
         match self {
-            Element::Range(ref r) => match (value.prev(), value.next()) {
+            Self::Range(ref r) => match (value.prev(), value.next()) {
                 (Some(p), Some(n)) => {
                     let prev = match r.start.cmp(&p) {
-                        Ordering::Equal => Some(Element::Single(p)),
+                        Ordering::Equal => Some(Self::Single(p)),
                         Ordering::Greater => None,
                         Ordering::Less => {
-                            Some(Element::Range(RangeInclusive::new(r.start.clone(), p)))
+                            Some(Self::Range(RangeInclusive::new(r.start.clone(), p)))
                         }
                     };
 
                     let next = match r.end.cmp(&n) {
-                        Ordering::Equal => Some(Element::Single(n)),
+                        Ordering::Equal => Some(Self::Single(n)),
                         Ordering::Less => None,
                         Ordering::Greater => {
-                            Some(Element::Range(RangeInclusive::new(n, r.end.clone())))
+                            Some(Self::Range(RangeInclusive::new(n, r.end.clone())))
                         }
                     };
 
@@ -112,10 +112,10 @@ impl<T: Step + Clone + Ord> Element<T> {
                 }
                 (Some(p), None) => {
                     let prev = match r.start.cmp(&p) {
-                        Ordering::Equal => Some(Element::Single(p)),
+                        Ordering::Equal => Some(Self::Single(p)),
                         Ordering::Greater => None,
                         Ordering::Less => {
-                            Some(Element::Range(RangeInclusive::new(r.start.clone(), p)))
+                            Some(Self::Range(RangeInclusive::new(r.start.clone(), p)))
                         }
                     };
 
@@ -127,10 +127,10 @@ impl<T: Step + Clone + Ord> Element<T> {
                     let prev = None;
 
                     let next = match r.end.cmp(&n) {
-                        Ordering::Equal => Some(Element::Single(n)),
+                        Ordering::Equal => Some(Self::Single(n)),
                         Ordering::Less => None,
                         Ordering::Greater => {
-                            Some(Element::Range(RangeInclusive::new(n, r.end.clone())))
+                            Some(Self::Range(RangeInclusive::new(n, r.end.clone())))
                         }
                     };
 
@@ -138,21 +138,21 @@ impl<T: Step + Clone + Ord> Element<T> {
                 }
                 _ => unreachable!(),
             },
-            Element::Single(_) => unreachable!(),
+            Self::Single(_) => unreachable!(),
         }
     }
 
     fn next(&self) -> Option<T> {
         match self {
-            Element::Single(ref s) => s.next(),
-            Element::Range(ref r) => r.end.next(),
+            Self::Single(ref s) => s.next(),
+            Self::Range(ref r) => r.end.next(),
         }
     }
 
     fn prev(&self) -> Option<T> {
         match self {
-            Element::Single(ref s) => s.prev(),
-            Element::Range(ref r) => r.start.prev(),
+            Self::Single(ref s) => s.prev(),
+            Self::Range(ref r) => r.start.prev(),
         }
     }
 }

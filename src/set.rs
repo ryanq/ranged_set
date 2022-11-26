@@ -36,9 +36,17 @@ use step::Step;
 /// ```
 ///
 /// [`Step`]: https://docs.rs/step/0.1.0/step/
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct RangedSet<T: Step + Clone + Ord> {
     ranges: Vec<Element<T>>,
+}
+
+impl<T: Step + Clone + Ord> Default for RangedSet<T> {
+    fn default() -> Self {
+        Self {
+            ranges: Vec::default(),
+        }
+    }
 }
 
 impl<T: Step + Clone + Ord> RangedSet<T> {
@@ -50,8 +58,8 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
     /// use ranged_set::RangedSet;
     /// let mut set: RangedSet<i32> = RangedSet::new();
     /// ```
-    pub fn new() -> RangedSet<T> {
-        RangedSet { ranges: Vec::new() }
+    pub fn new() -> Self {
+        Self::default()
     }
 
     /// Returns `true` if the set contains a value.
