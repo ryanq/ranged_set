@@ -50,8 +50,8 @@ impl<T: Step + Clone + Ord> RangedSet<T> {
     /// use ranged_set::RangedSet;
     /// let mut set: RangedSet<i32> = RangedSet::new();
     /// ```
-    pub fn new() -> RangedSet<T> {
-        RangedSet { ranges: Vec::new() }
+    pub fn new() -> Self {
+        Self { ranges: Vec::new() }
     }
 
     /// Returns `true` if the set contains a value.
